@@ -27,6 +27,7 @@ typedef enum
 
 typedef struct sw_i2c_s {
     int (*hal_init)(void);
+    int (*hal_deinit)(void);
     int (*hal_io_ctl)(hal_io_opt_e opt, void *arg);
     void (*hal_delay_us)(uint32_t us);
 } sw_i2c_t;
@@ -34,6 +35,7 @@ typedef struct sw_i2c_s {
 
 /* functions */
 void SW_I2C_initial(sw_i2c_t *d);
+void SW_I2C_deinit(sw_i2c_t *d);
 uint8_t SW_I2C_Read_8addr(sw_i2c_t *d, uint8_t IICID, uint8_t regaddr, uint8_t *pdata, uint8_t rcnt);
 uint8_t SW_I2C_Read_16addr(sw_i2c_t *d, uint8_t IICID, uint16_t regaddr, uint8_t *pdata, uint8_t rcnt);
 uint8_t SW_I2C_Write_8addr(sw_i2c_t *d, uint8_t IICID, uint8_t regaddr, uint8_t *pdata, uint8_t rcnt);

@@ -18,6 +18,14 @@ void SW_I2C_initial(sw_i2c_t *d)
     }
 }
 
+void SW_I2C_deinit(sw_i2c_t *d)
+{
+    if (d)
+    {
+        d->hal_deinit();
+    }
+}
+
 static void sda_out(sw_i2c_t *d, uint8_t out)
 {
     if(out)

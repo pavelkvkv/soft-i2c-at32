@@ -6,28 +6,13 @@
 
 #define SW_I2C1_SCL_PORT    GPIOA
 #define SW_I2C1_SDA_PORT    GPIOA
-#define SW_I2C1_SCL_PIN     GPIO_PIN_15
-#define SW_I2C1_SDA_PIN     GPIO_PIN_14
+#define SW_I2C1_SCL_PIN     GPIO_PINS_15
+#define SW_I2C1_SDA_PIN     GPIO_PINS_14
 
-
-static void GPIO_SetBits(gpio_type *GPIOx, uint16_t GPIO_Pin)
-{
-    gpio_bits_set(GPIOx, GPIO_Pin);
-}
-
-static void GPIO_ResetBits(gpio_type *GPIOx, uint16_t GPIO_Pin)
-{
-	gpio_bits_reset(GPIOx, GPIO_Pin);
-}
-
-static uint8_t GPIO_ReadInputDataBit(gpio_type *GPIOx, uint16_t GPIO_Pin)
-{
-	return (uint8_t)gpio_input_data_bit_read(GPIOx, GPIO_Pin);
-}
 
 static void sda_in_mode(void)
 {
-    static gpio_init_type GPIO_InitStruct = 
+    static const gpio_init_type GPIO_InitStruct = 
     {
         //.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER,
         //.gpio_out_type = GPIO_OUTPUT_PUSH_PULL,
@@ -40,7 +25,7 @@ static void sda_in_mode(void)
 
 static void sda_out_mode(void)
 {
-    static gpio_init_type GPIO_InitStruct = 
+    static const gpio_init_type GPIO_InitStruct = 
     {
         .gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER,
         .gpio_out_type = GPIO_OUTPUT_OPEN_DRAIN,
@@ -53,7 +38,7 @@ static void sda_out_mode(void)
 
 static void scl_in_mode(void)
 {
-    static gpio_init_type GPIO_InitStruct = 
+    static const gpio_init_type GPIO_InitStruct = 
     {
         .gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER,
         //.gpio_out_type = GPIO_OUTPUT_OPEN_DRAIN,
@@ -66,7 +51,7 @@ static void scl_in_mode(void)
 
 static void scl_out_mode(void)
 {
-    static gpio_init_type GPIO_InitStruct = 
+    static const gpio_init_type GPIO_InitStruct = 
     {
         .gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER,
         .gpio_out_type = GPIO_OUTPUT_OPEN_DRAIN,
@@ -89,10 +74,23 @@ static int sw_i2c_port_initial(void)
     };
 
     // i2c_sw SCL
-    GPIO_InitStruct.Pin = SW_I2C1_SCL_PIN;
+    GPIO_InitStruct.gpio_pins = SW_I2C1_SCL_PIN;
     gpio_init(SW_I2C1_SCL_PORT, &GPIO_InitStruct);
     // i2c_sw SDA
-    GPIO_InitStruct.Pin = SW_I2C1_SDA_PIN;
+    GPIO_InitStruct.gpio_pins = SW_I2C1_SDA_PIN;
+    gpio_init(SW_I2C1_SDA_PORT, &GPIO_InitStruct);
+    return 0;
+}
+
+static int sw_i2c_port_deinit(void)
+{
+    gpio_init_type GPIO_InitStruct = {0};
+
+    // i2c_sw SCL
+    GPIO_InitStruct.gpio_pins = SW_I2C1_SCL_PIN;
+    gpio_init(SW_I2C1_SCL_PORT, &GPIO_InitStruct);
+    // i2c_sw SDA
+    GPIO_InitStruct.gpio_pins = SW_I2C1_SDA_PIN;
     gpio_init(SW_I2C1_SDA_PORT, &GPIO_InitStruct);
     return 0;
 }
@@ -148,6 +146,7 @@ static int sw_i2c_port_io_ctl(uint8_t opt, void *param)
 
 sw_i2c_t sw_i2c_at32_generic = {
     .hal_init = sw_i2c_port_initial,
+    .hal_deinit = sw_i2c_port_deinit,
     .hal_io_ctl = sw_i2c_port_io_ctl,
     .hal_delay_us = sw_i2c_port_delay_us,
     };
