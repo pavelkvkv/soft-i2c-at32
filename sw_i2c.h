@@ -2,6 +2,8 @@
 #define _SW_I2C_H_
 
 #include <stdint.h>
+#include "at32f435_437_gpio.h"
+
 
 #define SW_I2C_WAIT_TIME    10 // 10us 100kHz
 
@@ -26,10 +28,14 @@ typedef enum
 }hal_io_opt_e;
 
 typedef struct sw_i2c_s {
-    int (*hal_init)(void);
-    int (*hal_deinit)(void);
-    int (*hal_io_ctl)(hal_io_opt_e opt, void *arg);
+    int (*hal_init)(void * slot);
+    int (*hal_deinit)(void * slot);
+    int (*hal_io_ctl)(hal_io_opt_e opt, void * slot);
     void (*hal_delay_us)(uint32_t us);
+    gpio_type * scl_port;
+    gpio_type * sda_port;
+    uint32_t scl_pin;
+    uint32_t sda_pin;
 } sw_i2c_t;
 
 

@@ -14,7 +14,7 @@ void SW_I2C_initial(sw_i2c_t *d)
 {
     if (d)
     {
-        d->hal_init();
+        d->hal_init(d);
     }
 }
 
@@ -22,63 +22,63 @@ void SW_I2C_deinit(sw_i2c_t *d)
 {
     if (d)
     {
-        d->hal_deinit();
+        d->hal_deinit(d);
     }
 }
 
 static void sda_out(sw_i2c_t *d, uint8_t out)
 {
     if(out)
-        d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, NULL);
+        d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, d);
     else
-        d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, NULL);
+        d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, d);
 }
 
 static void i2c_clk_data_out(sw_i2c_t *d)
 {
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
 }
 
 static void i2c_port_initial(sw_i2c_t *d)
 {
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
 }
 
 
 static uint8_t SW_I2C_ReadVal_SDA(sw_i2c_t *d)
 {
     
-    return d->hal_io_ctl(HAL_IO_OPT_GET_SDA_LEVEL, NULL);
+    return d->hal_io_ctl(HAL_IO_OPT_GET_SDA_LEVEL, d);
 }
 
 #if 0
 static uint8_t SW_I2C_ReadVal_SCL(sw_i2c_t *d)
 {
 
-    return d->hal_io_ctl(HAL_IO_OPT_GET_SCL_LEVEL, NULL);
+    return d->hal_io_ctl(HAL_IO_OPT_GET_SCL_LEVEL, d);
 }
 #endif
 
 static void i2c_start_condition(sw_i2c_t *d)
 {
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME << 1);
 }
 
 static void i2c_stop_condition(sw_i2c_t *d)
 {
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_HIGH, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
 }
 
@@ -87,8 +87,8 @@ static uint8_t i2c_check_ack(sw_i2c_t *d)
     uint8_t ack;
     int i;
     unsigned int temp;
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_INPUT, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_INPUT, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
     ack = 0;
     d->hal_delay_us(SW_I2C_WAIT_TIME);
     for (i = 10; i > 0; i--)
@@ -100,17 +100,17 @@ static uint8_t i2c_check_ack(sw_i2c_t *d)
             break;
         }
     }
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
     return ack;
 }
 
 static void i2c_check_not_ack(sw_i2c_t *d)
 {
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_INPUT, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_INPUT, d);
     i2c_clk_data_out(d);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
 }
 
@@ -127,7 +127,7 @@ static void i2c_slave_address(sw_i2c_t *d, uint8_t IICID, uint8_t readwrite)
         IICID &= ~I2C_READ;
     }
 
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
 
     for (x = 7; x >= 0; x--)
     {
@@ -142,7 +142,7 @@ static void i2c_register_address(sw_i2c_t *d, uint8_t addr)
 {
     int x;
 
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
 
     for (x = 7; x >= 0; x--)
     {
@@ -154,22 +154,22 @@ static void i2c_register_address(sw_i2c_t *d, uint8_t addr)
 
 static void i2c_send_ack(sw_i2c_t *d)
 {
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME << 1);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_LOW, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME << 1);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, d);
     d->hal_delay_us(SW_I2C_WAIT_TIME);
 }
 
 static void SW_I2C_Write_Data(sw_i2c_t *d, uint8_t data)
 {
     int x;
-    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
     for (x = 7; x >= 0; x--)
     {
         sda_out(d, data & (1 << x));
@@ -182,18 +182,18 @@ static uint8_t SW_I2C_Read_Data(sw_i2c_t *d)
 {
     int x;
     uint8_t readdata = 0;
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_INPUT, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_INPUT, d);
     for (x = 8; x--;)
     {
-        d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, NULL);
+        d->hal_io_ctl(HAL_IO_OPT_SET_SCL_HIGH, d);
         readdata <<= 1;
         if (SW_I2C_ReadVal_SDA(d))
             readdata |= 0x01;
         d->hal_delay_us(SW_I2C_WAIT_TIME);
-        d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, NULL);
+        d->hal_io_ctl(HAL_IO_OPT_SET_SCL_LOW, d);
         d->hal_delay_us(SW_I2C_WAIT_TIME);
     }
-    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, NULL);
+    d->hal_io_ctl(HAL_IO_OPT_SET_SDA_OUTPUT, d);
     return readdata;
 }
 
