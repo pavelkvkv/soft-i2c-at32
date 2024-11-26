@@ -1,9 +1,13 @@
 # Soft I2C
+Features:
+- various speed support (400 clock pulses per second and more on 288 MHz CPU)
+- multi-bus support
+- transmit/receive in blocking mode only
+- no interrupts, no timers required
+- concurrent access protected (mutex)
+- support for reading without a register
 
-That is Edited version of  [Original version](https://schkorea.tistory.com/437) for stm32
+Tested on FreeRTOS 10, Artery AT32f437, zero loss on 1000 samples
 
-原作者：https://schkorea.tistory.com/437
-
-精简了部分代码，增加8/16bit寄存器地址的突发（连续）读写函数
-
-移植到展锐8850平台
+# Fork source
+https://github.com/liyanboy74/soft-i2c
